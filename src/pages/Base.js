@@ -21,7 +21,6 @@ const navigation = [
     { name: 'Query 5', href: '/query5', current: false },
 ]
 
-//
 const titles = ['Name, Id, test']   //use them as displayed titles for the query viewer
 const properties = ['Name, Id, test'] // use this names to refer to the data in the json from the db
 
@@ -105,7 +104,7 @@ function Base({user, setUser}) {
     }
 
     return (
-        <div>
+        <div style={{width:"100%"}}>
             <div className="bg-gray-800">
                 <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
                     <div className="relative flex items-center justify-between h-16">

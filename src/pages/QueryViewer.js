@@ -5,20 +5,36 @@ import Table from "@material-ui/core/Table";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import LinearProgress from '@material-ui/core/LinearProgress'
 
 
 const displayedList = []
 
 const  QueryViewer = ({ExecuteQuery,query,params, titles,properties}) => {
 
-    const {
+    let {
         loading,
         error,
         results
     } = ExecuteQuery(query, params)
+    loading =true
 
     return (
-        <div style={{width:"100%", display:"flex", justifyContent:"center"}}>
+        <div style={{width:"100%", display:"flex", justifyContent:"center", flexDirection:"column"}}>
+            {
+                loading ?
+                    <div style={{width:"100%", display:"flex", alignItems:"center", flexDirection:"column"}}>
+                        <LinearProgress style={{width:"90%", marginTop:"3rem"}} />
+                        {/* <LinearProgress style={{width:"90%", marginTop:"2rem"}} color="secondary" />*/}
+                    </div>
+                    :null
+            }
+            {
+                console.log(results)
+            }
+            {
+                console.log(loading)
+            }
             <div style={{width:"90%",alignSelf:"center", marginTop:"2rem", marginBottom:"2rem"}}>
                 <TableContainer component={Paper}>
                     <Table size="small" aria-label="a dense table">

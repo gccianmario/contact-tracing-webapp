@@ -22,10 +22,26 @@ const properties = ['firstName', 'lastName', 'CF','vaccinated', 'infected'] // u
 
 //QUERY DEFINITION
 const query0='MATCH (p:Person) RETURN p LIMIT 30'
-const query1='MATCH (p:Person) RETURN p LIMIT 1'
-const query2='MATCH (p:Person) RETURN p LIMIT 2'
-const query3='MATCH (p:Person) RETURN p LIMIT 3'
-const query4='MATCH (p:Person) RETURN p LIMIT 4'
+const query1='MATCH (p:Person{infected:false}), (p2: Person), path = ( (p)-[r1:HAD|WITH*1..3]-(c:Contact)-[r2:HAD|WITH]-(p2{infected:true}))\n' +
+    'WITH nodes(path) AS pathNodes,p\n' +
+    'WHERE ALL(c IN pathNodes WHERE c:Contact OR c:Person)\n' +
+    'WITH pathNodes, REDUCE(totalIntensity = 0, n IN pathNodes | totalIntensity + COALESCE(n.intensity, 0)) AS reduction,p\n' +
+    'WHERE reduction >=180\n' +
+    'RETURN DISTINCT p'
+const query2='MATCH (p:Person{infected: false})-[g:GOES_IN]->(e2:Event)<-[:GOES_IN]-(p3:Person),(p4:Person)-[:GOES_IN]->(e1:Event)<-[g1:GOES_IN]-(p)-[h:HAD|WITH]-(c:Contact)-[w:WITH|HAD]-(p2:Person) \n' +
+    'where p2.infected = true \n' +
+    'and p3.infected = true\n' +
+    'and p4.infected = true\n' +
+    'and e1 <> e2 \n' +
+    'and g1 <> g\n' +
+    'return distinct p'
+const query3='MATCH (p:Person{infected: false})-[:LIVES]->(h1:House)<-[:LIVES]-(fam1: Person{infected: false}),(fam1)-[:HAD|WITH]-(c:Contact)-[:HAD|WITH]-(fam2:Person),(fam2)-[:LIVES]->(h2:House)<-[:LIVES]-(inf:Person{infected: true})\n' +
+    'WHERE c.intensity>=95\n' +
+    'RETURN DISTINCT p'
+const query4='MATCH path = (p:Person{infected:false})-[:HAD|WITH*]-(c:Contact)-[:WITH|HAD*]-(p2:Person{infected:true})\n' +
+    'WHERE ALL(elm IN nodes(path) WHERE (elm:Contact and elm.intensity>=90)  or elm:Person) \n' +
+    'WITH p,nodes(path) as chain,p2\n' +
+    'RETURN DISTINCT  p,chain,p2'
 const query5='MATCH (p:Person) RETURN p LIMIT 5'
 
 function Base({user, setUser}) {

@@ -1,10 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import LoginPage from "./pages/LoginPage";
 import React, {useState} from "react";
-import BaseTest from "./pages/BaseTest";
 import Base from "./pages/Base";
-import {auth} from "./components/firebaseTools";
 
 /*
     Hooks for Querying Data

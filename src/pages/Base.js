@@ -1,15 +1,11 @@
 import React, {useState} from "react";
-//import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
 import { Routes, Route, Link } from "react-router-dom";
 import {auth} from "../components/firebaseTools"
 import icon from '../logo.svg';
-import icon2 from '../photo57.jpg';
 import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-
-import LinearProgress from '@material-ui/core/LinearProgress'
 import {useReadCypher} from "use-neo4j";
 import QueryViewer from "./QueryViewer";
+import PeopleViewer from "./PeopleViewer";
 
 //handle navbar and the connected routes
 const navigation = [
@@ -21,16 +17,16 @@ const navigation = [
     { name: 'Query 5', href: '/query5', current: false },
 ]
 
-const titles = ['Name, Id, test']   //use them as displayed titles for the query viewer
-const properties = ['Name, Id, test'] // use this names to refer to the data in the json from the db
+const titles =     ['First name', 'Last name', 'SSN','Vaccinated', 'Infected']  //use them as displayed titles for the query viewer
+const properties = ['firstName', 'lastName', 'CF','vaccinated', 'infected'] // use this names to refer to the data in the json from the db
 
 //QUERY DEFINITION
-const query0=''
-const query1=''
-const query2=''
-const query3=''
-const query4=''
-const query5=''
+const query0='MATCH (p:Person) RETURN p LIMIT 30'
+const query1='MATCH (p:Person) RETURN p LIMIT 1'
+const query2='MATCH (p:Person) RETURN p LIMIT 2'
+const query3='MATCH (p:Person) RETURN p LIMIT 3'
+const query4='MATCH (p:Person) RETURN p LIMIT 4'
+const query5='MATCH (p:Person) RETURN p LIMIT 5'
 
 function Base({user, setUser}) {
     const [navState, setNavState] = useState(navigation)
@@ -59,8 +55,8 @@ function Base({user, setUser}) {
     const ExecuteQuery = (query, params)=>{
         //execute the cyper query and get the result in a js list together with loading and error
         //const queryTest = `MATCH (movie:Movie) RETURN movie LIMIT 10`
-        const queryTest = `MATCH (p:Person) RETURN p LIMIT 10`
-        const title = 'Apollo 13'
+        //const queryTest = `MATCH (p:Person) RETURN p LIMIT 10`
+        //const title = 'Apollo 13'
         //const params = { title } // Movie title passed as a prop
 
         const {
@@ -68,7 +64,7 @@ function Base({user, setUser}) {
             error,
             records,
             first
-        } = useReadCypher(queryTest, params)
+        } = useReadCypher(query, params)
 
         let results = []
         if(records) {
@@ -88,17 +84,13 @@ function Base({user, setUser}) {
 
     const Dashboard = ()=> {
         return (
-            <div style={{marginTop:"10%",display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center"}}>
+            <div style={{marginTop:"15%",display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center"}}>
                 <img
                     className="hidden lg:block h-8 w-auto"
                     src={icon}
                     alt="Logo"
-                    style={{height:"15rem", width:"15rem", marginTop:"1rem", marginBottom:"4rem"}}
+                    style={{height:"15rem", width:"15rem"}}
                 />
-                <Button
-                    variant='contained'
-                    onClick={sigOutRequest}
-                >Logout</Button>
             </div>
         )
     }
@@ -156,32 +148,32 @@ function Base({user, setUser}) {
                 <Route exact path="/" element={<Dashboard/>}/>
                 <Route exact path="/peopleList"
                        element={
-                           <QueryViewer ExecuteQuery={ExecuteQuery} query={query0} params={""} titles={[]} properties={[]}/>
+                           <PeopleViewer ExecuteQuery={ExecuteQuery} query={query0} params={""} titles={titles} properties={properties}/>
                        }
                 />
                 <Route exact path="/query1"
                        element={
-                           <QueryViewer ExecuteQuery={ExecuteQuery} query={query1} params={""} titles={[]} properties={[]}/>
+                           <QueryViewer key={"Q1"} ExecuteQuery={ExecuteQuery} query={query1} params={""} titles={titles} properties={properties}/>
                        }
                 />
                 <Route exact path="/query2"
                        element={
-                           <QueryViewer ExecuteQuery={ExecuteQuery} query={query2} params={""} titles={[]} properties={[]}/>
+                           <QueryViewer key={"Q2"} ExecuteQuery={ExecuteQuery} query={query2} params={""} titles={titles} properties={properties}/>
                        }
                 />
                 <Route exact path="/query3"
                        element={
-                           <QueryViewer ExecuteQuery={ExecuteQuery} query={query3} params={""} titles={[]} properties={[]}/>
+                           <QueryViewer key={"Q3"} ExecuteQuery={ExecuteQuery} query={query3} params={""} titles={titles} properties={properties}/>
                        }
                 />
                 <Route exact path="/query4"
                        element={
-                           <QueryViewer ExecuteQuery={ExecuteQuery} query={query4} params={""} titles={[]} properties={[]}/>
+                           <QueryViewer key={"Q4"} ExecuteQuery={ExecuteQuery} query={query4} params={""} titles={titles} properties={properties}/>
                        }
                 />
                 <Route exact path="/query5"
                        element={
-                           <QueryViewer ExecuteQuery={ExecuteQuery} query={query5} params={""} titles={[]} properties={[]}/>
+                           <QueryViewer key={"Q5"} ExecuteQuery={ExecuteQuery} query={query5} params={""} titles={titles} properties={properties}/>
                        }
                 />
             </Routes>

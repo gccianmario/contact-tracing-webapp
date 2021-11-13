@@ -4,8 +4,6 @@ import WaitingBar from "../components/WaitingBar";
 import ModifyPersonPanel from "../components/ModifyPersonPanel";
 
 
-const displayedList = []
-
 const  PeopleViewer = ({ExecuteQuery,query,params, titles,properties}) => {
     const [analyzedPerson, setAnalyzedPerson] = useState("")
     const messagesEndRef = React.createRef()
@@ -23,15 +21,18 @@ const  PeopleViewer = ({ExecuteQuery,query,params, titles,properties}) => {
         messagesStartRef.current?.scrollIntoView({ behavior: "smooth" })
     }
     useEffect(()=>{
-        if(analyzedPerson)
-            scrollToBottom()
-        else
+        if(analyzedPerson) {
+            if (scrollToTop)
+                scrollToBottom()
+        }
+        else if(scrollToTop)
             scrollToTop()
     },[analyzedPerson])
     return (
         <div ref={messagesStartRef} style={{width:"100%", display:"flex", justifyContent:"center", flexDirection:"column"}}>
             <WaitingBar loading={loading}/>
             <PeopleTable
+                error={error}
                 showSearch={true}
                 properties={properties}
                 titles={titles}
@@ -42,6 +43,7 @@ const  PeopleViewer = ({ExecuteQuery,query,params, titles,properties}) => {
             />
             <div ref={messagesEndRef} style={{marginBottom:"2rem"}}>
                 <ModifyPersonPanel
+                    ExecuteQuery={ExecuteQuery}
                     ref={messagesEndRef}
                     loading={loading}
                     properties={properties}

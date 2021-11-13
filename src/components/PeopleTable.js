@@ -9,7 +9,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import TextField from '@material-ui/core/TextField';
 
-const  PeopleTable = ({loading, titles,properties, results, showSearch=false, setAnalyzedPerson, clickable=false}) => {
+const  PeopleTable = ({loading,error, titles,properties, results, showSearch=false, setAnalyzedPerson, clickable=false}) => {
     const [filter, setFilter] = useState("")
 
     const executeQuery = (target, originalData) =>{
@@ -37,7 +37,7 @@ const  PeopleTable = ({loading, titles,properties, results, showSearch=false, se
     return (
         <div style={{display:"flex", flexDirection:"column"}}>
             {
-                !loading ?
+                !loading && !error ?
                     <div style={{display:"flex",width: "90%", alignSelf: "center", marginTop: "2rem", marginBottom: "2rem", flexDirection:"column"}}>
                         {
                             showSearch ?
@@ -75,7 +75,7 @@ const  PeopleTable = ({loading, titles,properties, results, showSearch=false, se
                                                             onClick={clickable ? ()=>onClickPerson(person) : ()=>null}
                                                             key={person["CF"] + prop}
                                                             align="right">
-                                                            {person[prop] ? person[prop].toString() : ""}
+                                                            {person[prop] !==undefined ? person[prop].toString() : ""}
                                                         </TableCell>
                                                     })
                                                 }
@@ -89,6 +89,7 @@ const  PeopleTable = ({loading, titles,properties, results, showSearch=false, se
                     </div>
                     :null
             }
+            {error ? <p>{"ERROR: " + error}</p> : <div/>}
         </div>
     )
 }

@@ -13,6 +13,7 @@ const  QueryViewer = ({ExecuteQuery,query,params, titles,properties}) => {
         <div style={{width:"100%", display:"flex", justifyContent:"center", flexDirection:"column"}}>
             <WaitingBar loading={loading}/>
             <PeopleTable
+                error={error}
                 properties={properties}
                 titles={titles}
                 loading={loading}

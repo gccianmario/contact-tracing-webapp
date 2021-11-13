@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import {auth} from "../components/firebaseTools"
 import icon from '../logo.svg';
-import Button from '@material-ui/core/Button';
 import {useReadCypher} from "use-neo4j";
 import QueryViewer from "./QueryViewer";
 import PeopleViewer from "./PeopleViewer";
@@ -10,24 +9,24 @@ import PeopleViewer from "./PeopleViewer";
 //handle navbar and the connected routes
 const navigation = [
     { name: 'People', href: '/peopleList', current: false },
-    { name: 'High risk', href: '/query1', current: false },
-    { name: 'Medium risk', href: '/query2', current: false },
-    { name: 'Query3', href: '/query3', current: false },
-    { name: 'Query 4', href: '/query4', current: false },
-    { name: 'Query 5', href: '/query5', current: false },
+    { name: 'Dangerous chains', href: '/query1', current: false },
+    { name: 'General contacts', href: '/query2', current: false },
+    { name: 'Contacts among families', href: '/query3', current: false },
+    { name: 'High intensity chains', href: '/query4', current: false },
+    { name: 'Not vaccinated contacts', href: '/query5', current: false },
 ]
 
 const titles =     ['First name', 'Last name', 'SSN','Vaccinated', 'Infected']  //use them as displayed titles for the query viewer
 const properties = ['firstName', 'lastName', 'CF','vaccinated', 'infected'] // use this names to refer to the data in the json from the db
 
 //QUERY DEFINITION
-const query0='MATCH (p:Person) RETURN p LIMIT 30'
-const query1='MATCH (p:Person{infected:false}), (p2: Person), path = ( (p)-[r1:HAD|WITH*1..3]-(c:Contact)-[r2:HAD|WITH]-(p2{infected:true}))\n' +
+const query0='MATCH (p:Person) RETURN p limit 100'
+const query1='MATCH path = ( (p:Person{infected:false})-[r1:HAD|WITH*1..3]-(c:Contact)-[r2:HAD|WITH*1..3]-(p2{infected:true}))\n' +
     'WITH nodes(path) AS pathNodes,p\n' +
     'WHERE ALL(c IN pathNodes WHERE c:Contact OR c:Person)\n' +
     'WITH pathNodes, REDUCE(totalIntensity = 0, n IN pathNodes | totalIntensity + COALESCE(n.intensity, 0)) AS reduction,p\n' +
     'WHERE reduction >=180\n' +
-    'RETURN DISTINCT p'
+    'RETURN DISTINCT p, pathNodes'
 const query2='MATCH (p:Person{infected: false})-[g:GOES_IN]->(e2:Event)<-[:GOES_IN]-(p3:Person),(p4:Person)-[:GOES_IN]->(e1:Event)<-[g1:GOES_IN]-(p)-[h:HAD|WITH]-(c:Contact)-[w:WITH|HAD]-(p2:Person) \n' +
     'where p2.infected = true \n' +
     'and p3.infected = true\n' +
@@ -42,7 +41,13 @@ const query4='MATCH path = (p:Person{infected:false})-[:HAD|WITH*]-(c:Contact)-[
     'WHERE ALL(elm IN nodes(path) WHERE (elm:Contact and elm.intensity>=90)  or elm:Person) \n' +
     'WITH p,nodes(path) as chain,p2\n' +
     'RETURN DISTINCT  p,chain,p2'
-const query5='MATCH (p:Person) RETURN p LIMIT 5'
+const query5='MATCH  \n' +
+    '(p1:Person{infected:TRUE})-[:LIVES]->(:House)<-[:LIVES]-(famp1:Person{vaccinated:FALSE})-[:GOES_IN]->(:Event)<-[:GOES_IN]-(p:Person{vaccinated:FALSE}) \n' +
+    'RETURN distinct p \n' +
+    'UNION \n' +
+    'MATCH \n' +
+    '(p2:Person{infected:TRUE})-[:LIVES]->(:House)<-[:LIVES]-(famp2:Person{vaccinated:FALSE})-[:HAD|WITH]-(:Contact)-[:HAD|WITH]-(p:Person{vaccinated:FALSE}) \n' +
+    'RETURN distinct p'
 
 function Base({user, setUser}) {
     const [navState, setNavState] = useState(navigation)
@@ -69,19 +74,13 @@ function Base({user, setUser}) {
         setNavState(newNavigation)
     }
     const ExecuteQuery = (query, params)=>{
-        //execute the cyper query and get the result in a js list together with loading and error
-        //const queryTest = `MATCH (movie:Movie) RETURN movie LIMIT 10`
-        //const queryTest = `MATCH (p:Person) RETURN p LIMIT 10`
-        //const title = 'Apollo 13'
-        //const params = { title } // Movie title passed as a prop
-
         const {
             loading,
             error,
             records,
             first
         } = useReadCypher(query, params)
-
+        //console.log("EX " + query)
         let results = []
         if(records) {
             records.forEach((elm) => {
